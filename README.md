@@ -19,7 +19,7 @@ Git requires your name and email to track changes.
 #### git config --global user.email "your_email@example.com"  (GITHUB EMAIL)
 ### Verify the settings:
 git config --global --list
-✅ Now Git will recognize your commits. Now can do push pull
+## ✅ Now Git will recognize your commits. Now can do push pull
 ---
 
 ## 🚀 Step 3: Set Up SSH Authentication (If You Haven’t Already)
@@ -60,7 +60,7 @@ ls ~/Kubernetees-/hdb-price-prediction/data/
 To edit a file in WSL, follow these steps:
 ### 1️⃣ Navigate to the Project Folder
 If you are not already inside the project directory, move into it:
-#### cd ~/hdb-price-prediction
+#### cd ~/Kubernetees-/hdb-price-prediction
 ### 2️⃣ Open the File for Editing
 You can edit files using different methods:
 ### Use Nano (Simple Terminal Editor)
