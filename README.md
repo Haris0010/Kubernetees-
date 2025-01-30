@@ -1,6 +1,6 @@
 # Kubernetees- INSTRUCTIONS
 
-🚀 Step 1: Clone the Repository
+##🚀 Step 1: Clone the Repository
 1️⃣ Open WSL Terminal.
 2️⃣ Navigate to your home directory:
 cd ~
