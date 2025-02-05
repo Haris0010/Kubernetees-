@@ -13,17 +13,19 @@ def load_data():
 
 def clean_data(df):
     """ Clean dataset (handle missing values, format columns) """
-    print("Cleaning data...")
+    print(" Cleaning data...")
 
     # Drop unnecessary columns
     df = df.drop(columns=["block", "street_name"])
 
     # Convert 'month' to datetime format and extract year
-    df["month"] = pd.to_datetime(df["month"], format="%Y-%m")
-    df["year"] = df["month"].dt.year
+    df["month"] = pd.to_datetime(df["month"], format="%Y-%m").dt.strftime("%Y-%m")
+    df["year"] = pd.to_datetime(df["month"], format="%Y-%m").dt.year
 
     # Convert 'storey_range' to a numeric median value
-    df["storey_range"] = df["storey_range"].str.extract(r"(\d+)").astype(float)
+    df[["storey_min", "storey_max"]] = df["storey_range"].str.extract(r"(\d+)\s*TO\s*(\d+)").astype(float)
+    df["storey_range"] = df[["storey_min", "storey_max"]].mean(axis=1)
+    df = df.drop(columns=["storey_min", "storey_max"])  # Drop temp columns
 
     # Convert 'remaining_lease' into numeric values (extract years)
     df["remaining_lease"] = df["remaining_lease"].str.extract(r"(\d+)").astype(float)
@@ -31,8 +33,12 @@ def clean_data(df):
     # One-hot encoding categorical columns
     df = pd.get_dummies(df, columns=["flat_model", "flat_type", "town"], drop_first=True)
 
-    print("Data cleaning completed.")
+    # Convert boolean values to 0/1 for ML models
+    df.loc[:, df.columns != "month"] = df.loc[:, df.columns != "month"].astype(int)
+
+    print(" Data cleaning completed.")
     return df
+
 
 def save_data(df):
     """ Save the cleaned dataset """
