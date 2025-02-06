@@ -14,7 +14,7 @@ def load_data():
 
 def clean_data(df):
     """ Clean dataset dynamically: handle missing values, convert columns, remove outliers """
-    print("🛠leaning data...")
+    print("Cleaning data...")
 
     # Drop unnecessary columns
     drop_cols = ["block", "street_name"]
@@ -22,7 +22,10 @@ def clean_data(df):
 
     # Convert 'month' to datetime format and extract year
     if "month" in df.columns:
-        df["month"] = pd.to_datetime(df["month"], format="%Y-%m").dt.year  # Convert to numeric
+        time = pd.to_datetime(df["month"], format="%Y-%m")
+        df["month"] = time.dt.month  # Convert to numeric
+        df["year"] = time.dt.year  # Convert to numeric
+
 
     # Convert 'storey_range' to numeric (extract median value)
     if "storey_range" in df.columns:
