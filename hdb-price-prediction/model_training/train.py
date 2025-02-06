@@ -1,105 +1,78 @@
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split
 import joblib
 
-PROCESSED_DATA_PATH = "hdb-price-prediction/data/processed_data.csv"
-saved_model_path = "hdb-price-prediction/saved_model"
+# File paths
+PROCESSED_DATA_PATH = "data/processed_data.csv"
+MODEL_SAVE_PATH = "data/saved_model.joblib"
 size_split = 0.2
-cv = 5
 
-data = pd.read_csv(PROCESSED_DATA_PATH)
+# Load processed dataset
+print(" Loading processed data...")
+df = pd.read_csv(PROCESSED_DATA_PATH)
+
+# **Dynamically drop all one-hot encoded 'month_*' columns**
+month_columns = [col for col in df.columns if col.startswith("month_")]
+df = df.drop(columns=month_columns)
+
+# Define features (X) and target (y)
+X = df.drop(columns=["resale_price"])  # Drop target
+y = df["resale_price"]
+
+# Split dataset into training and validation sets
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=size_split, random_state=42)
 
 # Define models to compare
-RandomForest = RandomForestClassifier(random_state=42)
-LogisticRegression = LogisticRegression(max_iter=1000, random_state=42)
-GradientBoosting = GradientBoostingClassifier(random_state=42)
-
-# Define hyperparameter grids for tuning
-param_grids = {
-    "RandomForest": {
-        "n_estimators": [100, 200],
-        "max_depth": [None, 10, 20],
-        "min_samples_split": [2, 5]
-    },
-    "LogisticRegression": {
-        "C": [0.01, 0.1, 1, 10],
-        "solver": ["lbfgs", "liblinear"]
-    },
-    "GradientBoosting": {
-        "n_estimators": [100, 200],
-        "learning_rate": [0.01, 0.1, 0.2],
-        "max_depth": [3, 5, 7]
-    }
+models = {
+    "RandomForest": RandomForestRegressor(random_state=42),
+    "LinearRegression": LinearRegression(),
+    "GradientBoosting": GradientBoostingRegressor(random_state=42)
 }
 
-def split_data(train_data):
-    X = train_data.drop(columns=["resale_price"])
-    y = train_data["resale_price"]
-
-    # Split the data
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=size_split, random_state=42)
-    return X_train, X_val, y_train, y_val
-
-
-def training(X_train, X_val, y_train, y_val, model, model_name):
+def train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name):
+    """Train model and evaluate performance"""
     
-
-    # Train model
+    print(f"\n Training {model_name}...")
     model.fit(X_train, y_train)
     y_val_pred = model.predict(X_val)
-    y_val_prob = model.predict_proba(X_val)[:, 1]
-    accuracy = accuracy_score(y_val, y_val_pred)
-    print(f"Validation Accuracy: {accuracy:.4f}")
-    print(f"Classification Report:\n", classification_report(y_val, y_val_pred))
-    print(f"Confusion Matrix:\n", confusion_matrix(y_val, y_val_pred))
-    roc_auc = roc_auc_score(y_val, y_val_prob)
-    print(f"ROC AUC Score: {roc_auc}")
 
-    # Cross-validation scores
-    cv_scores = cross_val_score(model, X_train, y_train, cv=cv)
-    cv_mean_accuracy = np.mean(cv_scores)
-    print(f"Cross-Validation Accuracy: {cv_mean_accuracy:.4f} ± {np.std(cv_scores):.4f}")
+    # Calculate performance metrics
+    mae = mean_absolute_error(y_val, y_val_pred)
+    mse = mean_squared_error(y_val, y_val_pred)
+    r2 = r2_score(y_val, y_val_pred)
 
-    return roc_auc, model
+    print(f"\n {model_name} Performance:")
+    print(f" - MAE: {mae:.2f}")
+    print(f" - MSE: {mse:.2f}")
+    print(f" - R² Score: {r2:.4f}")
 
-def saveModel(best_model, best_model_name, best_accuracy):
-    # Save the best model
-    joblib.dump(best_model, f'{saved_model_path}/best_model.joblib')
-    print(f"\nBest Model: {best_model_name} with ROC AUC Score: {best_accuracy:.4f}")
-    print(f"{best_model_name} model saved successfully!")
+    return r2, model
+
+def save_model(best_model, best_model_name, best_r2_score):
+    """Save the best model"""
+    joblib.dump(best_model, MODEL_SAVE_PATH)
+    print(f"\n Best Model: {best_model_name} with R² Score: {best_r2_score:.4f}")
+    print(f"{best_model_name} model saved successfully at {MODEL_SAVE_PATH}!")
 
 def main():
-    print("Step 1: Split the Data ")
-    X_train, X_val, y_train, y_val = split_data(data)
-    LogisticRegression.fit(X_train, y_train)
-    y_pred = LogisticRegression.predict(X_val)
-    accuracy = accuracy_score(y_val, y_pred)
-    print(f"Model Accuracy: {accuracy * 100:.2f}%")
-    joblib.dump(LogisticRegression, f'{saved_model_path}/best_model.joblib')
+    best_overall_model = None
+    best_overall_score = -float("inf")
+    best_model_name = ""
 
+    # Train each model and evaluate performance
+    for model_name, model in models.items():
+        r2, trained_model = train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name)
+        if r2 > best_overall_score:
+            best_overall_score = r2
+            best_overall_model = trained_model
+            best_model_name = model_name
 
-    
-    # print("Step 2: Train the Models")
-    # model_objects = {"RandomForest": RandomForest, "LogisticRegression": LogisticRegression, "GradientBoosting": GradientBoosting}
-    
-    # ModelRocAuc = {}
-    # TunedModels = {}
-    # for model_name, model in model_objects.items():
-    #     print(f"\n{model_name}")
-    #     roc_auc, tuned_model = training(X_train, X_val, y_train, y_val, model, model_name)
-    #     ModelRocAuc[model_name] = roc_auc
-    #     TunedModels[model_name] = tuned_model
-
-    # # Find the best model
-    # BestModelName, BestRocAuc = max(ModelRocAuc.items(), key=lambda x: x[1])
-    # BestModel = TunedModels[BestModelName]
-
-    # # Save the best model
-    # saveModel(BestModel, BestModelName, BestRocAuc)
+    # Save the best model
+    save_model(best_overall_model, best_model_name, best_overall_score)
 
 if __name__ == "__main__":
-    main()  
+    main()
