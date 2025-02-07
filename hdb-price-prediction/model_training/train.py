@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import joblib
 
+
 # File paths
 PROCESSED_DATA_PATH = "data/processed_data.csv"
 MODEL_SAVE_PATH = "data/saved_model.joblib"
@@ -25,6 +26,8 @@ y = df["resale_price"]
 
 # Split dataset into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=size_split, random_state=42)
+X_val.to_csv(f'data/X_val.csv', index=False)
+y_val.to_csv(f'data/y_val.csv', index=False)
 
 # Define models to compare
 models = {
@@ -32,6 +35,17 @@ models = {
     "LinearRegression": LinearRegression(),
     "GradientBoosting": GradientBoostingRegressor(random_state=42)
 }
+
+def train(X_train, X_val, y_train, y_val, model, model_name):
+    """Train model"""
+    
+    print(f"\n Training {model_name}...")
+    model.fit(X_train, y_train)
+    joblib.dump(model, f"data/{model_name}.joblib")
+
+
+     
+
 
 def train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name):
     """Train model and evaluate performance"""
@@ -52,27 +66,27 @@ def train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name):
 
     return r2, model
 
-def save_model(best_model, best_model_name, best_r2_score):
-    """Save the best model"""
-    joblib.dump(best_model, MODEL_SAVE_PATH)
-    print(f"\n Best Model: {best_model_name} with R² Score: {best_r2_score:.4f}")
-    print(f"{best_model_name} model saved successfully at {MODEL_SAVE_PATH}!")
+
 
 def main():
-    best_overall_model = None
-    best_overall_score = -float("inf")
-    best_model_name = ""
+    # best_overall_model = None
+    # best_overall_score = -float("inf")
+    # best_model_name = ""
 
-    # Train each model and evaluate performance
+    # # Train each model and evaluate performance
+    # for model_name, model in models.items():
+    #     r2, trained_model = train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name)
+    #     if r2 > best_overall_score:
+    #         best_overall_score = r2
+    #         best_overall_model = trained_model
+    #         best_model_name = model_name
+
+    # # Save the best model
+    # save_model(best_overall_model, best_model_name, best_overall_score)
     for model_name, model in models.items():
-        r2, trained_model = train_and_evaluate(X_train, X_val, y_train, y_val, model, model_name)
-        if r2 > best_overall_score:
-            best_overall_score = r2
-            best_overall_model = trained_model
-            best_model_name = model_name
-
-    # Save the best model
-    save_model(best_overall_model, best_model_name, best_overall_score)
+        train(X_train, X_val, y_train, y_val, model, model_name)
+        print(f"Training of {model_name} complete")
+    print("All Models Completed")
 
 if __name__ == "__main__":
     main()

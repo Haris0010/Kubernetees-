@@ -1,37 +1,60 @@
 from joblib import load
-
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, mean_absolute_error, mean_squared_error, r2_score
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 import joblib
 
-PROCESSED_DATA_PATH = "hdb-price-prediction/data/processed_data.csv"
-saved_model_path = "hdb-price-prediction/saved_model"
+MODEL_SAVE_PATH = "data/saved_model.joblib"
 
 
-model = load(f'{saved_model_path}/best_model.joblib')
+GB = load(f'data/GradientBoosting.joblib')
+LR = load(f'data/LinearRegression.joblib')
+RF = load(f'data/RandomForest.joblib')
+
+models = {
+    "RandomForest": RF,
+    "LinearRegression": LR,
+    "GradientBoosting": GB
+}
+
+X_val = pd.read_csv("data/X_val.csv")
+y_val = pd.read_csv("data/y_val.csv")
 
 def eval(X_val,y_val, model, model_name):
     y_val_pred = model.predict(X_val)
-    y_val_prob = model.predict_proba(X_val)[:, 1]
-    accuracy = accuracy_score(y_val, y_val_pred)
-    print(f"Validation Accuracy: {accuracy:.4f}")
-    print(f"Classification Report:\n", classification_report(y_val, y_val_pred))
-    print(f"Confusion Matrix:\n", confusion_matrix(y_val, y_val_pred))
-    roc_auc = roc_auc_score(y_val, y_val_prob)
-    print(f"ROC AUC Score: {roc_auc}")
+    mae = mean_absolute_error(y_val, y_val_pred)
+    mse = mean_squared_error(y_val, y_val_pred)
+    r2 = r2_score(y_val, y_val_pred)
+    print(f"\n {model_name} Performance:")
+    print(f" - MAE: {mae:.2f}")
+    print(f" - MSE: {mse:.2f}")
+    print(f" - R² Score: {r2:.4f}")
 
-    return roc_auc, model
+    return r2, model
 
-train_columns = train.drop(columns=['Survived']).columns
-test = test[train_columns]
+def save_model(best_model, best_model_name, best_r2_score):
+    """Save the best model"""
+    joblib.dump(best_model, MODEL_SAVE_PATH)
+    print(f"\n Best Model: {best_model_name} with R² Score: {best_r2_score:.4f}")
+    print(f"{best_model_name} model saved successfully at {MODEL_SAVE_PATH}!")
 
 
-predictions = model.predict(test)
+def main():
+    best_overall_model = None
+    best_overall_score = -float("inf")
+    best_model_name = ""
 
-test['Predictions'] = predictions
+    # Train each model and evaluate performance
+    for model_name, model in models.items():
+        r2, trained_model = eval(X_val,y_val, model, model_name)
+        if r2 > best_overall_score:
+            best_overall_score = r2
+            best_overall_model = trained_model
+            best_model_name = model_name
 
-# Save to a new CSV file
-test.to_csv(f'{prediction_data_path}/predictions_output.csv', index=False)
+    # Save the best model
+    save_model(best_overall_model, best_model_name, best_overall_score)
+    print("All Models Completed")
+
+if __name__ == "__main__":
+    main()
 
