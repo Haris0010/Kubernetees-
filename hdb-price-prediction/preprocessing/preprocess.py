@@ -3,12 +3,14 @@ from sklearn.preprocessing import LabelEncoder
 
 # Define file paths
 RAW_DATA_PATH = "data/sg-resale-flat-prices.csv"
+RAW_PREDICTION_PATH = "data/prediction_data.csv"
 PROCESSED_DATA_PATH = "data/processed_data.csv"
+PRED_DATA_PATH = "data/pred_data.csv"
 
-def load_data():
+def load_data(path):
     """ Load raw dataset """
     print("Loading raw data...")
-    df = pd.read_csv(RAW_DATA_PATH)
+    df = pd.read_csv(path)
     print(f"Loaded {df.shape[0]} rows and {df.shape[1]} columns.")
     return df
 
@@ -55,8 +57,7 @@ def clean_data(df):
             Q3 = df[col].quantile(0.75)
             IQR = Q3 - Q1
             df = df[(df[col] >= (Q1 - 1.5 * IQR)) & (df[col] <= (Q3 + 1.5 * IQR))]
-
-    # **Apply Label Encoding to categorical variables**
+    
     label_encoders = {}
     for col in categorical_cols:
         print(f"Label Encoding {col}...")
@@ -64,18 +65,24 @@ def clean_data(df):
         df[col] = le.fit_transform(df[col])
         label_encoders[col] = le
 
-    print("Data cleaning completed.")
-    return df, label_encoders
 
-def save_data(df):
+
+    print("Data cleaning completed.")
+    return df
+
+def save_data(df,df1):
     """ Save the cleaned dataset """
     df.to_csv(PROCESSED_DATA_PATH, index=False)
     print(f" Processed data saved to {PROCESSED_DATA_PATH}")
+    df1.to_csv(PRED_DATA_PATH, index=False)
+    print(f" Prediction data saved to {PRED_DATA_PATH}")
 
 def main():
-    df = load_data()
-    df, _ = clean_data(df)  # _ is used since we don't need label_encoders for now
-    save_data(df)
+    df_train = load_data(RAW_DATA_PATH)
+    df_pred = load_data(RAW_PREDICTION_PATH)
+    df_train = clean_data(df_train)
+    df_pred = clean_data(df_pred)
+    save_data(df_train,df_pred) 
 
 if __name__ == "__main__":
     main()
