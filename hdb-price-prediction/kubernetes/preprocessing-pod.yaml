@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: preprocessing-pod
+spec:
+  containers:
+  - name: preprocessing-container
+    image: cjunzhao/hdb-preprocessing:latest
+  volumes:
+    - name: preprocessing-storage
+      persistentVolumeClaim:
+        claimName: pvc
+  restartPolicy: Never
