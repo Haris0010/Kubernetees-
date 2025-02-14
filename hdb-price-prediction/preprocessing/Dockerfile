@@ -7,8 +7,7 @@ WORKDIR /app
 # Copy the current directory contents into the container
 COPY preprocess.py .
 COPY requirements.txt .
-COPY ./data/prediction_data.csv /data/
-COPY ./data/sg-resale-flat-prices.csv /data/
+COPY data /app/data
 
 # Install any dependencies (ensure you have a requirements.txt)
 RUN pip install --no-cache-dir -r requirements.txt

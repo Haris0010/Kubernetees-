@@ -6,6 +6,9 @@ spec:
   containers:
   - name: preprocessing-container
     image: cjunzhao/hdb-preprocessing:latest
+    volumeMounts:
+      - name: preprocessing-storage
+        mountPath: /app/data  # Saves preprocessed data here
   volumes:
     - name: preprocessing-storage
       persistentVolumeClaim:
