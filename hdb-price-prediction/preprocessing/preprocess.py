@@ -2,17 +2,25 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 # Define file paths
-RAW_DATA_PATH = "data/sg-resale-flat-prices.csv"
-RAW_PREDICTION_PATH = "data/prediction_data.csv"
-PROCESSED_DATA_PATH = "data/processed_data.csv"
-PRED_DATA_PATH = "data/pred_data.csv"
+RAW_DATA_PATH = "sg-resale-flat-prices.csv"
+RAW_PREDICTION_PATH = "prediction_data.csv"
+PROCESSED_DATA_PATH = "/app/data/processed_data.csv"
+PRED_DATA_PATH = "/app/data/pred_data.csv"
 
 def load_data(path):
     """ Load raw dataset """
     print("Loading raw data...")
-    df = pd.read_csv(path)
-    print(f"Loaded {df.shape[0]} rows and {df.shape[1]} columns.")
-    return df
+    try:
+        dfer = pd.read_csv(path) #HEY
+        print(f"Loaded {dfer.shape[0]} rows and {dfer.shape[1]} columns.")
+        return dfer
+    except FileNotFoundError:
+        print(f"Error: The file at {path} was not found.")
+        return None
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None
+
 
 def clean_data(df):
     """ Clean dataset dynamically: handle missing values, convert columns, remove outliers """
@@ -78,11 +86,13 @@ def save_data(df,df1):
     print(f" Prediction data saved to {PRED_DATA_PATH}")
 
 def main():
-    df_train = load_data(RAW_DATA_PATH)
-    df_pred = load_data(RAW_PREDICTION_PATH)
+    df_train = load_data(RAW_DATA_PATH)#HEY
+    df_pred = load_data(RAW_PREDICTION_PATH)#HEY
     df_train = clean_data(df_train)
     df_pred = clean_data(df_pred)
     save_data(df_train,df_pred) 
+
+    
 
 if __name__ == "__main__":
     main()

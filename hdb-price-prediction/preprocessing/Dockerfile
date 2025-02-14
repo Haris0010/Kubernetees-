@@ -5,9 +5,7 @@ FROM python:3.10
 WORKDIR /app
 
 # Copy the current directory contents into the container
-COPY preprocess.py .
-COPY requirements.txt .
-COPY data /app/data
+COPY . .
 
 # Install any dependencies (ensure you have a requirements.txt)
 RUN pip install --no-cache-dir -r requirements.txt

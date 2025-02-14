@@ -10,4 +10,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: "/data"  # Storage path on the Kubernetes node
+    path: "/mnt/data/my-storage"  # Storage path on the Kubernetes node

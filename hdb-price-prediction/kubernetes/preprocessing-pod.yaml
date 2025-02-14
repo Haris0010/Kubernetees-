@@ -5,7 +5,8 @@ metadata:
 spec:
   containers:
   - name: preprocessing-container
-    image: cjunzhao/hdb-preprocessing:latest
+    image: hhym123/hdb-preprocessing:v73.0
+    imagePullPolicy: Always
     volumeMounts:
       - name: preprocessing-storage
         mountPath: /app/data  # Saves preprocessed data here
