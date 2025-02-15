@@ -3,12 +3,12 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import pandas as pd
 import joblib
 
-MODEL_SAVE_PATH = "data/saved_model.joblib"
+MODEL_SAVE_PATH = "/app/data/saved_model.joblib"
 
 
-GB = load(f'data/GradientBoosting.joblib')
-LR = load(f'data/LinearRegression.joblib')
-RF = load(f'data/RandomForest.joblib')
+GB = load(f'/app/data/GradientBoosting.joblib')
+LR = load(f'/app/data/LinearRegression.joblib')
+RF = load(f'/app/data/RandomForest.joblib')
 
 models = {
     "RandomForest": RF,
@@ -16,8 +16,8 @@ models = {
     "GradientBoosting": GB
 }
 
-X_val = pd.read_csv("data/X_val.csv")
-y_val = pd.read_csv("data/y_val.csv")
+X_val = pd.read_csv("/app/data/X_val.csv")
+y_val = pd.read_csv("/app/data/y_val.csv")
 
 def eval(X_val,y_val, model, model_name):
     y_val_pred = model.predict(X_val)
