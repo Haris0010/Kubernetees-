@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: evaluation-pod
+spec:
+  containers:
+  - name: evaluation-container
+    image: haris001/hdb-evaluate:v73.0
+    imagePullPolicy: Always
+    volumeMounts:
+      - name: evaluation-storage
+        mountPath: /app/data  # Saves preprocessed data here
+  volumes:
+    - name: evaluation-storage
+      persistentVolumeClaim:
+        claimName: pvc
+  restartPolicy: Never
