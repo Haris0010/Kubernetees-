@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: training-pod
+spec:
+  containers:
+  - name: training-container
+    image: hhym123/hdb-training:v73.0
+    imagePullPolicy: Always
+    volumeMounts:
+      - name: training-storage
+        mountPath: /app/data  # Saves preprocessed data here
+  volumes:
+    - name: training-storage
+      persistentVolumeClaim:
+        claimName: pvc
+  restartPolicy: Never
