@@ -8,8 +8,9 @@ import joblib
 
 
 # File paths
-PROCESSED_DATA_PATH = "data/processed_data.csv"
-MODEL_SAVE_PATH = "data/saved_model.joblib"
+PROCESSED_DATA_PATH = "/app/data/processed_data.csv"
+MODEL_SAVE_PATH = "/app/data/"
+
 size_split = 0.2
 
 # Load processed dataset
@@ -26,8 +27,9 @@ y = df["resale_price"]
 
 # Split dataset into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=size_split, random_state=42)
-X_val.to_csv(f'data/X_val.csv', index=False)
-y_val.to_csv(f'data/y_val.csv', index=False)
+X_val.to_csv(f"/app/data/X_val.csv", index=False)
+y_val.to_csv(f"/app/data/y_val.csv", index=False)
+
 
 # Define models to compare
 models = {
@@ -41,7 +43,7 @@ def train(X_train, X_val, y_train, y_val, model, model_name):
     
     print(f"\n Training {model_name}...")
     model.fit(X_train, y_train)
-    joblib.dump(model, f"data/{model_name}.joblib")
+    joblib.dump(model, f"{MODEL_SAVE_PATH}{model_name}.joblib")
 
 
      
