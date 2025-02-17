@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  RAW_DATA_PATH: "/app/data/sg-resale-flat-prices.csv"
+  RAW_PREDICTION_PATH: "/app/data/prediction_data.csv"
+  PROCESSED_DATA_PATH: "/app/data/processed_data.csv"
+  PRED_DATA_PATH: "/app/data/pred_data.csv"
+  MODEL_SAVE_PATH: "/app/data/"
