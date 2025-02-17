@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: training-container
-        image: haris001/hdb-training:v74.0
+        image: hhym123/hdb-training:v75.0
         imagePullPolicy: Always
         volumeMounts:
         - name: training-storage
