@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: prediction-container
-        image: walkingduck/prediction-job:v75.0
+        image: walkingduck/prediction-job:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: prediction-storage

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: preprocessing-deployment
+spec:
+  replicas: 1  # Ensures one instance runs continuously
+  selector:
+    matchLabels:
+      app: preprocessing
+  template:
+    metadata:
+      labels:
+        app: preprocessing
+    spec:
+      containers:
+      - name: preprocessing-container
+        image: walkingduck/preprocessing
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: preprocessing-storage
+          mountPath: /app/data
+        envFrom:
+        - configMapRef:
+            name: app-config
+        ports:
+        - containerPort: 8000  # Expose the service
+      volumes:
+      - name: preprocessing-storage
+        persistentVolumeClaim:
+          claimName: pvc
+      restartPolicy: Always  # Keeps the container running

@@ -1,42 +1,36 @@
+from flask import Flask, request, jsonify
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
 import joblib
 import os
+
+app = Flask(__name__)
 
 PROCESSED_DATA_PATH = os.getenv('PROCESSED_DATA_PATH')
 MODEL_SAVE_PATH = os.getenv('MODEL_SAVE_PATH')
 
-size_split = 0.2
-print("Loading processed data...")
-df = pd.read_csv(PROCESSED_DATA_PATH)
+@app.route('/train', methods=['POST'])
+def train_model():
+    df = pd.read_csv(PROCESSED_DATA_PATH)
 
-month_columns = [col for col in df.columns if col.startswith("month_")]
-df = df.drop(columns=month_columns)
-X = df.drop(columns=["resale_price"])
-y = df["resale_price"]
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=size_split, random_state=42)
-X_val.to_csv("/app/data/X_val.csv", index=False)
-y_val.to_csv("/app/data/y_val.csv", index=False)
+    X = df.drop(columns=["resale_price"])
+    y = df["resale_price"]
 
-models = {
-    "RandomForest": RandomForestRegressor(random_state=42),
-    "LinearRegression": LinearRegression(),
-    "GradientBoosting": GradientBoostingRegressor(random_state=42)
-}
+    models = {
+        "RandomForest": RandomForestRegressor(random_state=42),
+        "LinearRegression": LinearRegression(),
+        "GradientBoosting": GradientBoostingRegressor(random_state=42)
+    }
 
-def train(X_train, X_val, y_train, y_val, model, model_name):
-    print(f"\nTraining {model_name}...")
-    model.fit(X_train, y_train)
-    joblib.dump(model, f"{MODEL_SAVE_PATH}{model_name}.joblib")
-def main():
     for model_name, model in models.items():
-        train(X_train, X_val, y_train, y_val, model, model_name)
-        print(f"Training of {model_name} complete")
-    print("All Models Completed")
+        model.fit(X, y)
+        joblib.dump(model, f"{MODEL_SAVE_PATH}{model_name}.joblib")
+
+    # Call Evaluation API
+    requests.post("http://evaluation-service:8000/evaluate")
+
+    return jsonify({"message": "Training completed, Evaluation started!"})
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=8000, debug=True)

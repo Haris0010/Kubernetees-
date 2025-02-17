@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evaluation-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: evaluation
+  template:
+    metadata:
+      labels:
+        app: evaluation
+    spec:
+      containers:
+      - name: evaluation-container
+        image: walkingduck/evaluate
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: evaluation-storage
+          mountPath: /app/data
+        envFrom:
+        - configMapRef:
+            name: app-config
+        ports:
+        - containerPort: 8000
+      volumes:
+      - name: evaluation-storage
+        persistentVolumeClaim:
+          claimName: pvc
+      restartPolicy: Always
