@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: preprocessing-container
-        image: haris001/hdb-preprocessing:v74.0
+        image: cjunzhao/hdb-preprocessing:v75.0
         imagePullPolicy: Always
         volumeMounts:
         - name: preprocessing-storage
