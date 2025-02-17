@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: training-container
-        image: walkingduck/training
+        image: haris001/training:v2
         imagePullPolicy: Always
         volumeMounts:
         - name: training-storage
