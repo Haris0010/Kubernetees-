@@ -26,10 +26,10 @@ def train_model():
         for model_name, model in models.items():
             model.fit(X, y)
             joblib.dump(model, f"{MODEL_SAVE_PATH}{model_name}.joblib")
-        return jsonify({"message": "Training completed!"})
+        return jsonify({"message": "Training completed!"}), 200
     except Exception as e:
         logging.error(f"Error in training: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8001, debug=True)

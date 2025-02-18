@@ -7,6 +7,6 @@ spec:
     app: evaluation
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 8000
+      port: 8002
+      targetPort: 8002
   type: ClusterIP

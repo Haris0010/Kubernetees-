@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: prediction-container
-        image: haris001/prediction:v4
+        image: hhym123/predict:v5.0
         imagePullPolicy: Always
         volumeMounts:
         - name: prediction-storage
@@ -23,7 +23,7 @@ spec:
         - configMapRef:
             name: app-config
         ports:
-        - containerPort: 8000
+        - containerPort: 8003
       volumes:
       - name: prediction-storage
         persistentVolumeClaim:

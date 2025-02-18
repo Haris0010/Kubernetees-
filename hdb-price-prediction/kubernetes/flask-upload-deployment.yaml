@@ -14,10 +14,17 @@ spec:
     spec:
       containers:
       - name: flask-api-container
-        image: haris001/flask:v7
+        image: hhym123/flask:v17.0
         imagePullPolicy: Always
+        volumeMounts:
+        - name: flask-storage
+          mountPath: /app/data
         envFrom:
         - configMapRef:
             name: app-config
-        ports:
+        ports:                      
         - containerPort: 5000
+      volumes:
+      - name: flask-storage
+        persistentVolumeClaim:
+          claimName: pvc

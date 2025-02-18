@@ -10,5 +10,7 @@ COPY . .
 # Install any dependencies (ensure you have a requirements.txt)
 RUN pip install --no-cache-dir -r requirements.txt
 
+EXPOSE 8000
+
 # Command to run when the container starts
 CMD ["python", "preprocess.py"]

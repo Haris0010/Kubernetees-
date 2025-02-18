@@ -22,10 +22,10 @@ def evaluate_models():
             if score > best_score:
                 best_model, best_score, best_name = model, score, name
         dump(best_model, f'{MODEL_SAVE_PATH}saved_model.joblib')
-        return jsonify({"message": f"Best model: {best_name}"})
+        return jsonify({"message": f"Best model: {best_name}"}), 200
     except Exception as e:
         logging.error(f"Error in evaluation: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8002, debug=True)

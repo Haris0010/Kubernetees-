@@ -11,5 +11,7 @@ COPY requirements.txt .
 # Install any dependencies (ensure you have a requirements.txt)
 RUN pip install --no-cache-dir -r requirements.txt
 
+EXPOSE 8003
+
 # Command to run when the container starts
 CMD ["python", "predict.py"]

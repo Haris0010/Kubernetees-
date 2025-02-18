@@ -22,7 +22,7 @@ def predict():
         predictions = model.predict(test)
         test['Predictions'] = predictions
         test.to_csv(f'{MODEL_SAVE_PATH}predictions_output.csv', index=False)
-        return jsonify({"message": "Prediction completed!"})
+        return jsonify({"message": "Prediction completed!"}), 200
     except Exception as e:
         logging.error(f"Error in prediction: {e}")
         return jsonify({"error": str(e)}), 500
@@ -31,10 +31,10 @@ def predict():
 def get_predictions():
     try:
         pred_file = pd.read_csv(f'{MODEL_SAVE_PATH}predictions_output.csv')
-        return jsonify({"predictions": pred_file['Predictions'].tolist()})
+        return jsonify({"predictions": pred_file['Predictions'].tolist()}), 200
     except Exception as e:
         logging.error(f"Error fetching predictions: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8003, debug=True)

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: evaluation-container
-        image: haris001/evaluate:v4
+        image: hhym123/evaluate:v5.0
         imagePullPolicy: Always
         volumeMounts:
         - name: evaluation-storage
@@ -23,7 +23,7 @@ spec:
         - configMapRef:
             name: app-config
         ports:
-        - containerPort: 8000
+        - containerPort: 8002
       volumes:
       - name: evaluation-storage
         persistentVolumeClaim:

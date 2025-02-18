@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: training-container
-        image: haris001/training:v4
+        image:  hhym123/training:v5.0
         imagePullPolicy: Always
         volumeMounts:
         - name: training-storage
@@ -23,7 +23,7 @@ spec:
         - configMapRef:
             name: app-config
         ports:
-        - containerPort: 8000
+        - containerPort: 8001
       volumes:
       - name: training-storage
         persistentVolumeClaim:

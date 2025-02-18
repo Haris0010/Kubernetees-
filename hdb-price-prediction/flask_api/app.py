@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template_string, jsonify
+from flask import Flask, request, render_template_string, jsonify
 import os
 import pandas as pd
 import logging
@@ -6,12 +6,16 @@ from kubernetes import client, config
 import time
 import requests
 
+
 app = Flask(__name__)
-UPLOAD_FOLDER = '/app/uploads'
+
+UPLOAD_FOLDER = '/app/data'
+MODEL_SAVE_PATH = os.getenv('MODEL_SAVE_PATH')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -149,17 +153,18 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_files():
     if 'dataset1' not in request.files or 'dataset2' not in request.files:
-        return redirect(request.url)
+        return "No files found", 400
     dataset1 = request.files['dataset1']
     dataset2 = request.files['dataset2']
     if dataset1.filename == '' or dataset2.filename == '':
-        return redirect(request.url)
-    dataset1_path = os.path.join(app.config['UPLOAD_FOLDER'], dataset1.filename)
-    dataset2_path = os.path.join(app.config['UPLOAD_FOLDER'], dataset2.filename)
+        return "No files selected", 400
+    dataset1_path = os.path.join(app.config['UPLOAD_FOLDER'], "sg-resale-flat-prices.csv")
+    dataset2_path = os.path.join(app.config['UPLOAD_FOLDER'], "prediction_data.csv")
     dataset1.save(dataset1_path)
     dataset2.save(dataset2_path)
 
     try:
+        # Scale the deployments one by one
         scale_deployment('preprocessing-deployment', 1)
         wait_for_pod('preprocessing')
         scale_deployment('training-deployment', 1)
@@ -169,40 +174,137 @@ def upload_files():
         scale_deployment('prediction-deployment', 1)
         wait_for_pod('prediction')
 
-        response = requests.get('http://prediction-service:8000/get_predictions')
-        predictions = response.json().get('predictions', [])
-        return render_template_string('''
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Predictions</title>
-            <style>
-                body { font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #a1c4fd, #c2e9fb); margin: 0; }
-                .container { padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); text-align: center; }
-                h1 { color: #333; font-size: 26px; margin-bottom: 15px; }
-                table { margin-top: 20px; width: 100%; border-collapse: collapse; }
-                th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
-                th { background: #a1c4fd; color: white; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Prediction Results</h1>
-                <table>
-                    <tr><th>Index</th><th>Predicted Value</th></tr>
-                    {% for i in range(predictions|length) %}
-                    <tr><td>{{ i+1 }}</td><td>{{ predictions[i] }}</td></tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </body>
-        </html>
-        ''', predictions=predictions)
+        # Send POST requests for each process
+        preprocessing_response = requests.post("http://preprocessing-service:8000/process")
+        if preprocessing_response.status_code != 200:
+            return f"Error in Preprocessing: {preprocessing_response.text}", 500
+        
+        model_training_response = requests.post("http://training-service:8001/train")
+        if model_training_response.status_code != 200:
+            return f"Error in Model Training: {model_training_response.text}", 500
+
+        eval_response = requests.post("http://evaluation-service:8002/evaluate")
+        if eval_response.status_code != 200:
+            return f"Error in Evaluation: {eval_response.text}", 500
+
+        prediction_response = requests.post("http://prediction-service:8003/predict")
+        if prediction_response.status_code != 200:
+            return f"Error in Prediction: {prediction_response.text}", 500
+        
+        get_predictions_response = requests.get("http://prediction-service:8003/get_predictions")
+        if get_predictions_response.status_code == 200:
+            df = pd.read_csv(f'{MODEL_SAVE_PATH}predictions_output.csv')
+            rows = df.values.tolist()
+            headers = df.columns.tolist()
+
+            html_content = """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>CSV Data</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+                    body {
+                        font-family: 'Poppins', sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        background: linear-gradient(135deg, #fbc2eb, #a6c1ee, #ffdde1, #c1f0d6, #fdd9b5);
+                        background-size: 300% 300%;
+                        animation: smoothBackground 7s infinite linear;
+                    }
+                    @keyframes smoothBackground {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                    .container {
+                        padding: 40px;
+                        background: white;
+                        border-radius: 20px;
+                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                        text-align: center;
+                        max-width: 800px;
+                        animation: fadeIn 1s ease-in-out;
+                        overflow-x: auto;
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(-15px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    h1 {
+                        color: #333;
+                        margin-bottom: 25px;
+                        font-size: 28px;
+                        font-weight: 700;
+                        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        text-shadow: 2px 2px 8px rgba(255, 65, 108, 0.3);
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                    }
+                    table, th, td {
+                        border: 1px solid #ff7597;
+                    }
+                    th, td {
+                        padding: 12px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #ff9a9e;
+                        color: white;
+                    }
+                    td {
+                        background-color: #fffaf0;
+                    }
+                    tr:hover {
+                        background-color: #f8d8da;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>CSV Data</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for header in headers %}
+                                    <th>{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td>{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </body>
+            </html>
+            """
+
+            # Render the HTML content with the data
+            return render_template_string(html_content, rows=rows, headers=headers)
+        else:
+            return f"Error in Displaying Predictions: {get_predictions_response.text}", 500
+
     except Exception as e:
-        logging.error(f"Error in upload: {e}")
+        logging.error(f"Error during file upload and processing: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

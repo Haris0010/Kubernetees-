@@ -36,7 +36,7 @@ def process_data():
         df_pred = clean_data(df_pred)
         df_train.to_csv(PROCESSED_DATA_PATH, index=False)
         df_pred.to_csv(PRED_DATA_PATH, index=False)
-        return jsonify({"message": "Preprocessing completed!"})
+        return jsonify({"message": "Preprocessing completed!"}), 200
     except Exception as e:
         logging.error(f"Error in preprocessing: {e}")
         return jsonify({"error": str(e)}), 500
