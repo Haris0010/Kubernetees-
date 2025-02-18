@@ -229,8 +229,9 @@ def upload_files():
                         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
                         text-align: center;
                         max-width: 800px;
+                        max-height: 70vh;
+                        overflow-y: auto; /* Added vertical scroll */
                         animation: fadeIn 1s ease-in-out;
-                        overflow-x: auto;
                     }
                     @keyframes fadeIn {
                         from { opacity: 0; transform: translateY(-15px); }
@@ -295,7 +296,6 @@ def upload_files():
             </body>
             </html>
             """
-
             # Render the HTML content with the data
             return render_template_string(html_content, rows=rows, headers=headers)
         else:

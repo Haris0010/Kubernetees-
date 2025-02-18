@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - configmap.yaml
+  - flask-upload-service.yaml
+  - preprocessing-deployment.yaml
+  - role.yaml
+  - evaluate-deployment.yaml
+  - evaluate-service.yaml
+  - preprocessing-service.yaml
+  - rolebinding.yaml
+  - prediction-deployment.yaml
+  - prediction-service.yaml
+  - flask-upload-deployment.yaml
+  - training-deployment.yaml
+  - training-service.yaml
+  - pv.yaml
+  - pvc.yaml
