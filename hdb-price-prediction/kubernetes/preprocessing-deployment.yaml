@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: preprocessing-container
-        image: haris001/preprocessing:v2
+        image: haris001/preprocessing:v3
         imagePullPolicy: Always
         volumeMounts:
         - name: preprocessing-storage

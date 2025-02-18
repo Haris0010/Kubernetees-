@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: evaluation-container
-        image: walkingduck/evaluate
+        image: haris001/evaluate:v3
         imagePullPolicy: Always
         volumeMounts:
         - name: evaluation-storage
