@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: evaluation-container
-        image: hhym123/evaluate:v5.0
+        image: walkingduck/evaluation:v7
         imagePullPolicy: Always
         volumeMounts:
         - name: evaluation-storage

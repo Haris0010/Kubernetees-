@@ -9,13 +9,15 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 MODEL_SAVE_PATH = os.getenv('MODEL_SAVE_PATH')
+XVAL_PATH = os.getenv('XVAL_PATH')
+YVAL_PATH = os.getenv('YVAL_PATH')
 
 @app.route('/evaluate', methods=['POST'])
 def evaluate_models():
     try:
         models = {name: load(f'{MODEL_SAVE_PATH}{name}.joblib') for name in ["RandomForest", "LinearRegression", "GradientBoosting"]}
-        X_val = pd.read_csv("/app/data/X_val.csv")
-        y_val = pd.read_csv("/app/data/y_val.csv")
+        X_val = pd.read_csv(XVAL_PATH)
+        y_val = pd.read_csv(YVAL_PATH)
         best_model, best_score, best_name = None, -float("inf"), ""
         for name, model in models.items():
             score = r2_score(y_val, model.predict(X_val))

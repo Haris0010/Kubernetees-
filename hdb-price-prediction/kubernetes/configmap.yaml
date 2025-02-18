@@ -8,4 +8,6 @@ data:
   RAW_PREDICTION_PATH: "/app/data/prediction_data.csv"
   PROCESSED_DATA_PATH: "/app/data/processed_data.csv"
   PRED_DATA_PATH: "/app/data/pred_data.csv"
+  XVAL_PATH: "/app/data/X_val.csv"
+  YVAL_PATH: "/app/data/y_val.csv"
   MODEL_SAVE_PATH: "/app/data/"
