@@ -14,6 +14,10 @@ spec:
     spec:
       containers:
       - name: flask-api-container
-        image: haris001/flask:v3
+        image: haris001/flask:v7
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: app-config
         ports:
         - containerPort: 5000

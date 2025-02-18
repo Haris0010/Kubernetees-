@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: evaluation-container
-        image: haris001/evaluate:v3
+        image: haris001/evaluate:v4
         imagePullPolicy: Always
         volumeMounts:
         - name: evaluation-storage

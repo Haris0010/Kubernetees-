@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: preprocessing-deployment
 spec:
-  replicas: 1  # Ensures one instance runs continuously
+  replicas: 1
   selector:
     matchLabels:
       app: preprocessing
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: preprocessing-container
-        image: haris001/preprocessing:v3
+        image: haris001/preprocessing:v4
         imagePullPolicy: Always
         volumeMounts:
         - name: preprocessing-storage
@@ -23,9 +23,9 @@ spec:
         - configMapRef:
             name: app-config
         ports:
-        - containerPort: 8000  # Expose the service
+        - containerPort: 8000
       volumes:
       - name: preprocessing-storage
         persistentVolumeClaim:
           claimName: pvc
-      restartPolicy: Always  # Keeps the container running
+      restartPolicy: Always

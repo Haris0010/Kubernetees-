@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: training-container
-        image: haris001/training:v3
+        image: haris001/training:v4
         imagePullPolicy: Always
         volumeMounts:
         - name: training-storage

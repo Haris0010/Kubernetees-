@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: prediction-container
-        image: haris001/prediction:v3
+        image: haris001/prediction:v4
         imagePullPolicy: Always
         volumeMounts:
         - name: prediction-storage
