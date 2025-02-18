@@ -164,15 +164,6 @@ def upload_files():
     dataset2.save(dataset2_path)
 
     try:
-        # Scale the deployments one by one
-        scale_deployment('preprocessing-deployment', 1)
-        wait_for_pod('preprocessing')
-        scale_deployment('training-deployment', 1)
-        wait_for_pod('training')
-        scale_deployment('evaluation-deployment', 1)
-        wait_for_pod('evaluation')
-        scale_deployment('prediction-deployment', 1)
-        wait_for_pod('prediction')
 
         # Send POST requests for each process
         preprocessing_response = requests.post("http://preprocessing-service:8000/process")
