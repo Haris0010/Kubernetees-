@@ -2,6 +2,26 @@
 
 This project deploys an AI pipeline in Kubernetes, handling data preprocessing, model training, evaluation, prediction, and a Flask web UI.
 
+## **Link to GitHub**
+https://github.com/Haris0010/Kubernetees-/
+
+## **Minimum System Requirements**
+| Component | Specification |
+|-----------|--------------|
+| **CPU** | AMD Ryzen 7 5800H / Intel Core i7-11800H or higher |
+| **RAM** | 32GB DDR4 or higher |
+| **Operating System** | Windows 10/11, macOS, or Linux (Ubuntu 24.04 recommended) |
+
+## **Recommended System Requirements**
+For better performance in model training and deployment:
+| Component | Specification |
+|-----------|--------------|
+| **CPU** | AMD Ryzen 9 5900X / Intel Core i9-12900K |
+| **RAM** | 64GB DDR4/DDR5 |
+
+## **Install Required Software**
+Ensure you have **Docker, Kubernetes, and Minikube** installed.
+
 ---
 
 ## Project Directory Structure
@@ -69,7 +89,7 @@ hdb-price-prediction/
 
 ## System Architecture
 
-![](./Images/system-architecture.png "System Architecture")
+![](./Images/system-architecture.jpeg "System Architecture")
 
 From the flask webite, users will upload the data and it will get stored inside a persistent storage (PS), the preprocessing container will then retrieve the uploaded data from PS and carry out preprocessing. 
 
@@ -137,27 +157,19 @@ The prediction container then takes the best saved model and preprocessed predic
 minikube start
 ```
 
-### 2. Set Up Persistent Storage
-```sh
-minikube ssh
-mkdir -p /mnt/data/my-storage
-sudo chmod 777 /mnt/data/my-storage
-exit
-```
-
-### 3. Apply Kubernetes Configurations
+### 2. Apply Kubernetes Configurations
 Navigate to the Kubernetes directory:
 ```sh
 cd hdb-price-prediction/kubernetes
 kubectl apply -k .
 ```
 
-### 4. Check if all pods are running
+### 3. Check if all pods are running
 ```sh
 kubectl get pods
 ```
 
-### 5. Access the Flask API
+### 4. Access the Flask API
 ```sh
 minikube service flask-api-service-node --url
 ```
@@ -189,5 +201,9 @@ Click the generated URL to open the Flask web UI.
 - Add GPU acceleration for faster training.
 - Implement weighted voting in model selection.
 - Automate hyperparameter tuning.
+- Implement autoscaling to handle variable loads dynamically.
+- Set up CI/CD pipelines for automating deployment and testing.
+- Use a distributed file system (like S3 or NFS) instead of PVCs for better scalability.
+
 
 ---
