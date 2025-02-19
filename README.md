@@ -193,7 +193,11 @@ Click the generated URL to open the Flask web UI.
   ```sh
   kubectl delete -f kubernetes/
   ```
-
+- Run each container seperately:
+  ```sh
+  curl -X POST 127.0.0.1:<PORT>/<PROCESS>
+  ```
+  Replace <PORT> and <PROCESS> with the container you are trying to run (e.g. for processing-deployment: `curl -X POST 127.0.0.1:8000/process`)
 ---
 
 ## Future Improvements
