@@ -96,7 +96,7 @@ kubectl get pods
 
 ### 5. Access the Flask API
 ```sh
-minikube service flask-api-service --url
+minikube service flask-api-service-node --url
 ```
 Click the generated URL to open the Flask web UI.
 
